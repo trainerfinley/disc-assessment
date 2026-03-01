@@ -1,18 +1,36 @@
+/* Base layout */
 body {
   font-family: Arial, sans-serif;
   max-width: 900px;
   margin: 40px auto;
+  padding: 0 12px;              /* Better mobile spacing */
   line-height: 1.5;
+  font-size: 17px;              /* Slightly larger for readability */
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Question titles */
+.question-title {
+  font-size: 18px;
+  margin: 30px 0 10px;
+  font-weight: bold;
+}
+
+/* Table container for mobile scrolling */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-bottom: 30px;
 }
 
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;             /* Prevents squishing on small screens */
+}
+
 th, td {
-  padding: 8px;
+  padding: 10px;
   text-align: center;
   border: 1px solid #ccc;
 }
@@ -24,14 +42,17 @@ th {
 td:first-child {
   text-align: left;
   font-weight: bold;
+  white-space: normal;          /* Allow adjectives to wrap */
 }
 
-.question-title {
-  font-size: 18px;
-  margin: 20px 0 10px;
-  font-weight: bold;
+/* Larger tap targets for radio buttons */
+input[type="radio"] {
+  width: 22px;
+  height: 22px;
+  margin: 6px;
 }
 
+/* Results box */
 #results {
   margin-top: 40px;
   padding: 20px;
@@ -43,9 +64,27 @@ td:first-child {
   margin-top: 0;
 }
 
+/* Buttons */
 button {
-  padding: 12px 24px;
+  padding: 14px 24px;
   font-size: 16px;
   cursor: pointer;
+  border: 1px solid #888;
+  background: #f7f7f7;
 }
 
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+
+  th, td {
+    padding: 12px 8px;
+  }
+
+  button {
+    width: 100%;                /* Full-width buttons on phones */
+    margin-top: 20px;
+  }
+}
