@@ -114,6 +114,23 @@ function scoreDISC() {
     }
   }
 
+  function retake() {
+  const form = document.getElementById("discForm");
+  const results = document.getElementById("results");
+
+  // Clear all radio buttons
+  const radios = form.querySelectorAll('input[type="radio"]');
+  radios.forEach(r => r.checked = false);
+
+  // Hide results
+  results.style.display = "none";
+  results.innerHTML = "";
+
+  // Scroll back to top (optional)
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+  
   // Determine primary type (lowest score = strongest)
   const totals = {D,I,S,C};
   const primary = Object.entries(totals).sort((a,b)=>a[1]-b[1])[0][0];
@@ -126,6 +143,7 @@ function scoreDISC() {
     <p><strong>S:</strong> ${S}</p>
     <p><strong>C:</strong> ${C}</p>
     <h3>Your Primary Type: ${primary}</h3>
+    <button id="retakeBtn" onclick="retake()" style="margin-top:20px;">Retake Assessment</button>
   `;
 }
 </script>
