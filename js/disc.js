@@ -23,20 +23,23 @@ questions.forEach((set, i) => {
   const block = document.createElement("div");
   block.innerHTML = `
     <div class="question-title">Question ${i+1}</div>
-    <table>
-      <tr>
-        <th>Adjective</th>
-        <th>1</th><th>2</th><th>3</th><th>4</th>
-      </tr>
-      ${set.map((word, r) => `
+
+    <div class="table-wrapper">
+      <table>
         <tr>
-          <td>${word}</td>
-          ${[1,2,3,4].map(rank => `
-            <td><input type="radio" name="q${i}_r${r}" value="${rank}"></td>
-          `).join("")}
+          <th>Adjective</th>
+          <th>1</th><th>2</th><th>3</th><th>4</th>
         </tr>
-      `).join("")}
-    </table>
+        ${set.map((word, r) => `
+          <tr>
+            <td>${word}</td>
+            ${[1,2,3,4].map(rank => `
+              <td><input type="radio" name="q${i}_r${r}" value="${rank}"></td>
+            `).join("")}
+          </tr>
+        `).join("")}
+      </table>
+    </div>
   `;
   form.appendChild(block);
 });
@@ -123,14 +126,11 @@ function scoreDISC() {
 function retake() {
   const results = document.getElementById("results");
 
-  // Clear all radio buttons
   const radios = document.querySelectorAll('input[type="radio"]');
   radios.forEach(r => r.checked = false);
 
-  // Hide results
   results.style.display = "none";
   results.innerHTML = "";
 
-  // Scroll to top
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
