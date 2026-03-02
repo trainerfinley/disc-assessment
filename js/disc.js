@@ -1,5 +1,5 @@
 // ---------------------------
-// Adjective sets (from PDF)
+// Adjective sets
 // ---------------------------
 const questions = [
   ["Enthusiastic","Bold","Conscientious","Friendly"],
@@ -16,6 +16,9 @@ const questions = [
 
 const form = document.getElementById("discForm");
 
+// Track selected ranks: selectedRanks[q][r] = 1–4
+const selectedRanks = Array.from({length: 10}, () => [null, null, null, null]);
+
 // ---------------------------
 // Build question blocks
 // ---------------------------
@@ -27,22 +30,17 @@ questions.forEach((set, i) => {
   block.innerHTML = `
     <div class="question-title">Question ${i+1} of 10</div>
 
-    <div class="table-wrapper">
-      <table>
-        <tr>
-          <th>Adjective</th>
-          <th>1</th><th>2</th><th>3</th><th>4</th>
-        </tr>
-        ${set.map((word, r) => `
-          <tr>
-            <td>${word}</td>
-            ${[1,2,3,4].map(rank => `
-              <td><input type="radio" name="q${i}_r${r}" value="${rank}"></td>
-            `).join("")}
-          </tr>
-        `).join("")}
-      </table>
-    </div>
+    ${set.map((word, r) => `
+      <div class="rank-row">
+        <div class="rank-label">${word}</div>
+        <div class="rank-buttons" data-q="${i}" data-r="${r}">
+          <button type="button" onclick="selectRank(${i},${r},1)">1</button>
+          <button type="button" onclick="selectRank(${i},${r},2)">2</button>
+          <button type="button" onclick="selectRank(${i},${r},3)">3</button>
+          <button type="button" onclick="selectRank(${i},${r},4)">4</button>
+        </div>
+      </div>
+    `).join("")}
 
     <div class="nav-buttons">
       ${i > 0 ? `<button type="button" onclick="prevQuestion()">Back</button>` : `<span></span>`}
@@ -52,6 +50,27 @@ questions.forEach((set, i) => {
 
   form.appendChild(block);
 });
+
+// ---------------------------
+// Rank selection logic
+// ---------------------------
+function selectRank(q, r, value) {
+  selectedRanks[q][r] = value;
+
+  const row = document.querySelector(`.rank-buttons[data-q="${q}"][data-r="${r}"]`);
+  const buttons = row.querySelectorAll("button");
+
+  buttons.forEach(btn => {
+    const v = Number(btn.textContent);
+    if (v === value) {
+      btn.classList.add("selected");
+      btn.disabled = false;
+    } else {
+      btn.classList.remove("selected");
+      btn.disabled = true;
+    }
+  });
+}
 
 // ---------------------------
 // Navigation logic
@@ -78,20 +97,18 @@ function prevQuestion() {
 }
 
 function validateQuestion(q) {
-  let ranksUsed = [];
-  for (let r=0; r<4; r++) {
-    const radios = document.querySelectorAll(`input[name="q${q}_r${r}"]`);
-    const checked = [...radios].find(x => x.checked);
-    if (!checked) {
+  const used = [];
+  for (let r = 0; r < 4; r++) {
+    const val = selectedRanks[q][r];
+    if (!val) {
       alert(`Please complete all rankings in Question ${q+1}.`);
       return false;
     }
-    const rank = checked.value;
-    if (ranksUsed.includes(rank)) {
+    if (used.includes(val)) {
       alert(`Each rank (1–4) must be used once in Question ${q+1}.`);
       return false;
     }
-    ranksUsed.push(rank);
+    used.push(val);
   }
   return true;
 }
@@ -121,38 +138,20 @@ function scoreDISC() {
 
   let D=0, I=0, S=0, C=0;
 
-  for (let q=0; q<10; q++) {
-    let ranksUsed = [];
-
-    for (let r=0; r<4; r++) {
-      const radios = document.querySelectorAll(`input[name="q${q}_r${r}"]`);
-      const checked = [...radios].find(x => x.checked);
-
-      if (!checked) {
-        alert(`Please complete all rankings in Question ${q+1}.`);
-        return;
-      }
-
-      const rank = checked.value;
-      if (ranksUsed.includes(rank)) {
-        alert(`Each rank (1–4) must be used once in Question ${q+1}.`);
-        return;
-      }
-      ranksUsed.push(rank);
-
+  for (let q = 0; q < 10; q++) {
+    for (let r = 0; r < 4; r++) {
+      const rank = selectedRanks[q][r];
       const adjective = questions[q][r];
       const category = mapping[adjective];
 
-      if (category === "D") D += Number(rank);
-      if (category === "I") I += Number(rank);
-      if (category === "S") S += Number(rank);
-      if (category === "C") C += Number(rank);
+      if (category === "D") D += rank;
+      if (category === "I") I += rank;
+      if (category === "S") S += rank;
+      if (category === "C") C += rank;
     }
   }
 
   const totals = {D,I,S,C};
-
-  // Highest score = primary type
   const primary = Object.entries(totals).sort((a,b)=>b[1]-a[1])[0][0];
 
   results.style.display = "block";
@@ -175,8 +174,16 @@ function scoreDISC() {
 function retake() {
   const results = document.getElementById("results");
 
-  const radios = document.querySelectorAll('input[type="radio"]');
-  radios.forEach(r => r.checked = false);
+  // Reset selections
+  selectedRanks.forEach((row, q) => {
+    row.forEach((_, r) => selectedRanks[q][r] = null);
+  });
+
+  // Reset buttons
+  document.querySelectorAll(".rank-buttons button").forEach(btn => {
+    btn.disabled = false;
+    btn.classList.remove("selected");
+  });
 
   results.style.display = "none";
   results.innerHTML = "";
