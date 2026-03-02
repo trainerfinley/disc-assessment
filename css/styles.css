@@ -86,6 +86,16 @@ button {
   cursor: pointer;
 }
 
+.pulse {
+  animation: pulseAnim 0.25s ease-out;
+}
+
+@keyframes pulseAnim {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
 /* Mobile adjustments */
 @media (max-width: 600px) {
   body {
