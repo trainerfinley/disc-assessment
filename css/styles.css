@@ -37,25 +37,35 @@ body {
   font-weight: bold;
 }
 
-/* Rank buttons */
+/* Rank buttons (medium size + padding) */
 .rank-buttons button {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   margin: 4px;
-  font-size: 18px;
+  font-size: 22px;
+  padding: 12px;
+  border-radius: 8px;
   border: 1px solid #888;
   background: #f7f7f7;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
+/* Selected state */
 .rank-buttons button.selected {
   background: #d0e6ff;
   border-color: #4a90e2;
 }
 
-.rank-buttons button:disabled {
-  opacity: 0.4;
-  cursor: default;
+/* Pulse animation */
+.pulse {
+  animation: pulseAnim 0.25s ease-out;
+}
+
+@keyframes pulseAnim {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
 }
 
 /* Navigation buttons */
@@ -77,23 +87,13 @@ body {
   margin-top: 0;
 }
 
-/* Buttons */
+/* General buttons */
 button {
   padding: 14px 24px;
   font-size: 16px;
   border: 1px solid #888;
   background: #f7f7f7;
   cursor: pointer;
-}
-
-.pulse {
-  animation: pulseAnim 0.25s ease-out;
-}
-
-@keyframes pulseAnim {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.15); }
-  100% { transform: scale(1); }
 }
 
 /* Mobile adjustments */
@@ -107,10 +107,12 @@ button {
     align-items: flex-start;
   }
 
+  /* Larger buttons on mobile */
   .rank-buttons button {
-    width: 56px;
-    height: 56px;
-    font-size: 20px;
+    width: 72px;
+    height: 72px;
+    font-size: 26px;
+    padding: 14px;
   }
 
   button {
