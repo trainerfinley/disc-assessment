@@ -24,46 +24,43 @@ body {
   display: block;
 }
 
-/* Table container for mobile scrolling */
-.table-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 30px;
+/* Adjective row layout */
+.rank-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0;
 }
 
-/* Table styling */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px;
-}
-
-th, td {
-  padding: 10px;
-  text-align: center;
-  border: 1px solid #ccc;
-}
-
-th {
-  background: #f0f0f0;
-}
-
-td:first-child {
-  text-align: left;
+.rank-label {
+  flex: 1;
   font-weight: bold;
-  white-space: normal;
 }
 
-/* Larger tap targets */
-input[type="radio"] {
-  width: 22px;
-  height: 22px;
-  margin: 6px;
+/* Rank buttons */
+.rank-buttons button {
+  width: 48px;
+  height: 48px;
+  margin: 4px;
+  font-size: 18px;
+  border: 1px solid #888;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+
+.rank-buttons button.selected {
+  background: #d0e6ff;
+  border-color: #4a90e2;
+}
+
+.rank-buttons button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* Navigation buttons */
 .nav-buttons {
-  margin-top: 20px;
+  margin-top: 25px;
   display: flex;
   justify-content: space-between;
 }
@@ -84,9 +81,9 @@ input[type="radio"] {
 button {
   padding: 14px 24px;
   font-size: 16px;
-  cursor: pointer;
   border: 1px solid #888;
   background: #f7f7f7;
+  cursor: pointer;
 }
 
 /* Mobile adjustments */
@@ -95,8 +92,15 @@ button {
     font-size: 16px;
   }
 
-  th, td {
-    padding: 12px 8px;
+  .rank-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rank-buttons button {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
   }
 
   button {
