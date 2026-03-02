@@ -1,136 +1,106 @@
-// ---------------------------
-// Adjective sets (from PDF)
-// ---------------------------
-const questions = [
-  ["Enthusiastic","Bold","Conscientious","Friendly"],
-  ["Logical","Attractive","Good-natured","Outspoken"],
-  ["Agreeable","Outgoing","Daring","Careful"],
-  ["Strong-willed","Tactful","Sympathetic","Charming"],
-  ["Gentle","Well-disciplined","Talkative","Pioneering"],
-  ["Competitive","Even-tempered","Good Mixer","Thorough"],
-  ["Sociable","Dominant","Controlled","Easygoing"],
-  ["Reserved","Appealing","Kind","Direct"],
-  ["High-spirited","Amiable","Vigorous","Accurate"],
-  ["Restless","Expressive","Diplomatic","Considerate"]
-];
-
-// ---------------------------
-// Build the radio-button grids
-// ---------------------------
-const form = document.getElementById("discForm");
-
-questions.forEach((set, i) => {
-  const block = document.createElement("div");
-  block.innerHTML = `
-    <div class="question-title">Question ${i+1}</div>
-
-    <div class="table-wrapper">
-      <table>
-        <tr>
-          <th>Adjective</th>
-          <th>1</th><th>2</th><th>3</th><th>4</th>
-        </tr>
-        ${set.map((word, r) => `
-          <tr>
-            <td>${word}</td>
-            ${[1,2,3,4].map(rank => `
-              <td><input type="radio" name="q${i}_r${r}" value="${rank}"></td>
-            `).join("")}
-          </tr>
-        `).join("")}
-      </table>
-    </div>
-  `;
-  form.appendChild(block);
-});
-
-// Add submit button
-const submitBtn = document.createElement("button");
-submitBtn.type = "button";
-submitBtn.textContent = "Submit";
-submitBtn.onclick = scoreDISC;
-form.appendChild(submitBtn);
-
-// ---------------------------
-// DISC mapping
-// ---------------------------
-const mapping = {
-  "Bold":"D","Outspoken":"D","Daring":"D","Strong-willed":"D","Pioneering":"D",
-  "Competitive":"D","Dominant":"D","Direct":"D","Vigorous":"D","Restless":"D",
-
-  "Enthusiastic":"I","Attractive":"I","Outgoing":"I","Charming":"I","Talkative":"I",
-  "Good Mixer":"I","Sociable":"I","Appealing":"I","High-spirited":"I","Expressive":"I",
-
-  "Good-natured":"S","Agreeable":"S","Sympathetic":"S","Gentle":"S","Even-tempered":"S",
-  "Controlled":"S","Kind":"S","Amiable":"S","Diplomatic":"S","Considerate":"S",
-
-  "Conscientious":"C","Logical":"C","Careful":"C","Tactful":"C","Well-disciplined":"C",
-  "Thorough":"C","Easygoing":"C","Reserved":"C","Accurate":"C"
-};
-
-// ---------------------------
-// Scoring function
-// ---------------------------
-function scoreDISC() {
-  const results = document.getElementById("results");
-
-  let D=0, I=0, S=0, C=0;
-
-  for (let q=0; q<10; q++) {
-    let ranksUsed = [];
-
-    for (let r=0; r<4; r++) {
-      const radios = document.querySelectorAll(`input[name="q${q}_r${r}"]`);
-      const checked = [...radios].find(x => x.checked);
-
-      if (!checked) {
-        alert(`Please complete all rankings in Question ${q+1}.`);
-        return;
-      }
-
-      const rank = checked.value;
-      if (ranksUsed.includes(rank)) {
-        alert(`Each rank (1–4) must be used once in Question ${q+1}.`);
-        return;
-      }
-      ranksUsed.push(rank);
-
-      const adjective = questions[q][r];
-      const category = mapping[adjective];
-
-      if (category === "D") D += Number(rank);
-      if (category === "I") I += Number(rank);
-      if (category === "S") S += Number(rank);
-      if (category === "C") C += Number(rank);
-    }
-  }
-
-  const totals = {D,I,S,C};
-  const primary = Object.entries(totals).sort((a,b)=>a[1]-b[1])[0][0];
-
-  results.style.display = "block";
-  results.innerHTML = `
-    <h2>Your DISC Results</h2>
-    <p><strong>D:</strong> ${D}</p>
-    <p><strong>I:</strong> ${I}</p>
-    <p><strong>S:</strong> ${S}</p>
-    <p><strong>C:</strong> ${C}</p>
-    <h3>Primary Type: ${primary}</h3>
-    <button onclick="retake()" style="margin-top:20px;">Retake Assessment</button>
-  `;
+/* Base layout */
+body {
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 12px;
+  line-height: 1.5;
+  font-size: 17px;
 }
 
-// ---------------------------
-// Retake function
-// ---------------------------
-function retake() {
-  const results = document.getElementById("results");
+/* Question titles */
+.question-title {
+  font-size: 18px;
+  margin: 30px 0 10px;
+  font-weight: bold;
+}
 
-  const radios = document.querySelectorAll('input[type="radio"]');
-  radios.forEach(r => r.checked = false);
+/* One-question-at-a-time blocks */
+.question-block {
+  display: none;
+}
 
-  results.style.display = "none";
-  results.innerHTML = "";
+.question-block.active {
+  display: block;
+}
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
+/* Table container for mobile scrolling */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 30px;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+th {
+  background: #f0f0f0;
+}
+
+td:first-child {
+  text-align: left;
+  font-weight: bold;
+  white-space: normal;
+}
+
+/* Larger tap targets */
+input[type="radio"] {
+  width: 22px;
+  height: 22px;
+  margin: 6px;
+}
+
+/* Navigation buttons */
+.nav-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Results box */
+#results {
+  margin-top: 40px;
+  padding: 20px;
+  border: 2px solid #ccc;
+  display: none;
+}
+
+#results h2 {
+  margin-top: 0;
+}
+
+/* Buttons */
+button {
+  padding: 14px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #888;
+  background: #f7f7f7;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+
+  th, td {
+    padding: 12px 8px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 20px;
+  }
 }
