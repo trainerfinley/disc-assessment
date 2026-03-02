@@ -64,11 +64,10 @@ function selectRank(q, r, value) {
     const v = Number(btn.textContent);
     if (v === value) {
       btn.classList.add("selected");
-      btn.disabled = false;
     } else {
       btn.classList.remove("selected");
-      btn.disabled = true;
     }
+    btn.disabled = false; // allow changing selection
   });
 }
 
