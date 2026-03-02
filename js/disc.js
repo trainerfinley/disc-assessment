@@ -52,7 +52,7 @@ questions.forEach((set, i) => {
 });
 
 // ---------------------------
-// Rank selection logic
+// Rank selection logic (animated + changeable)
 // ---------------------------
 function selectRank(q, r, value) {
   selectedRanks[q][r] = value;
@@ -62,11 +62,15 @@ function selectRank(q, r, value) {
 
   buttons.forEach(btn => {
     const v = Number(btn.textContent);
+
     if (v === value) {
       btn.classList.add("selected");
+      btn.classList.add("pulse");   // animation class
+      setTimeout(() => btn.classList.remove("pulse"), 250);
     } else {
       btn.classList.remove("selected");
     }
+
     btn.disabled = false; // allow changing selection
   });
 }
@@ -173,12 +177,10 @@ function scoreDISC() {
 function retake() {
   const results = document.getElementById("results");
 
-  // Reset selections
   selectedRanks.forEach((row, q) => {
     row.forEach((_, r) => selectedRanks[q][r] = null);
   });
 
-  // Reset buttons
   document.querySelectorAll(".rank-buttons button").forEach(btn => {
     btn.disabled = false;
     btn.classList.remove("selected");
