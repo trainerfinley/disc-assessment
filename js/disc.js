@@ -52,7 +52,7 @@ questions.forEach((set, i) => {
 });
 
 // ---------------------------
-// Rank selection logic (animated + changeable)
+// Rank selection logic (animated + cross-row disabling)
 // ---------------------------
 function selectRank(q, r, value) {
   selectedRanks[q][r] = value;
@@ -65,14 +65,45 @@ function selectRank(q, r, value) {
 
     if (v === value) {
       btn.classList.add("selected");
-      btn.classList.add("pulse");   // animation class
+      btn.classList.add("pulse");
       setTimeout(() => btn.classList.remove("pulse"), 250);
     } else {
       btn.classList.remove("selected");
     }
 
-    btn.disabled = false; // allow changing selection
+    btn.disabled = false; // selected row always stays enabled
   });
+
+  updateRowDisabling(q);
+}
+
+// ---------------------------
+// Disable same rank in other rows of the question
+// ---------------------------
+function updateRowDisabling(q) {
+  const usedRanks = selectedRanks[q];
+
+  for (let r = 0; r < 4; r++) {
+    const row = document.querySelector(`.rank-buttons[data-q="${q}"][data-r="${r}"]`);
+    const buttons = row.querySelectorAll("button");
+
+    buttons.forEach(btn => {
+      const v = Number(btn.textContent);
+
+      // If this row already selected something, keep all buttons enabled
+      if (usedRanks[r] !== null) {
+        btn.disabled = false;
+        return;
+      }
+
+      // Disable ranks already used in other rows
+      if (usedRanks.includes(v)) {
+        btn.disabled = true;
+      } else {
+        btn.disabled = false;
+      }
+    });
+  }
 }
 
 // ---------------------------
@@ -177,10 +208,12 @@ function scoreDISC() {
 function retake() {
   const results = document.getElementById("results");
 
+  // Reset selections
   selectedRanks.forEach((row, q) => {
     row.forEach((_, r) => selectedRanks[q][r] = null);
   });
 
+  // Reset buttons
   document.querySelectorAll(".rank-buttons button").forEach(btn => {
     btn.disabled = false;
     btn.classList.remove("selected");
