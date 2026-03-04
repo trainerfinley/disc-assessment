@@ -52,7 +52,7 @@ questions.forEach((set, i) => {
 });
 
 // ---------------------------
-// Rank selection logic (animated + global disabling)
+// Rank selection logic (animated + correct global disabling)
 // ---------------------------
 function selectRank(q, r, value) {
   selectedRanks[q][r] = value;
@@ -76,25 +76,27 @@ function selectRank(q, r, value) {
 }
 
 // ---------------------------
-// Disable same rank in ALL other rows (correct behavior)
+// Disable same rank in ALL other rows (exact behavior of reference page)
 // ---------------------------
 function updateRowDisabling(q) {
-  const usedRanks = selectedRanks[q]; // [?, ?, ?, ?]
+  const usedRanks = selectedRanks[q]; // e.g., [3, null, 1, null]
 
   for (let r = 0; r < 4; r++) {
     const row = document.querySelector(`.rank-buttons[data-q="${q}"][data-r="${r}"]`);
     const buttons = row.querySelectorAll("button");
+    const rowValue = usedRanks[r];
 
     buttons.forEach(btn => {
       const v = Number(btn.textContent);
 
       // If this row already selected something, keep all buttons enabled
-      if (usedRanks[r] !== null) {
+      if (rowValue !== null) {
         btn.disabled = false;
         return;
       }
 
-      // Disable numbers used in ANY other row
+      // If this row has NOT selected yet:
+      // Disable any number used in ANY other row
       if (usedRanks.includes(v)) {
         btn.disabled = true;
       } else {
