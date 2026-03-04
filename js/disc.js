@@ -17,7 +17,7 @@ const questions = [
 const form = document.getElementById("discForm");
 
 // Track selected ranks: selectedRanks[q][r] = 1–4
-const selectedRanks = Array.from({length: 10}, () => [null, null, null, null]);
+const selectedRanks = Array.from({ length: 10 }, () => [null, null, null, null]);
 
 // ---------------------------
 // Build question blocks
@@ -28,7 +28,7 @@ questions.forEach((set, i) => {
   block.dataset.index = i;
 
   block.innerHTML = `
-    <div class="question-title">Question ${i+1} of 10</div>
+    <div class="question-title">Question ${i + 1} of 10</div>
 
     ${set.map((word, r) => `
       <div class="rank-row">
@@ -52,7 +52,7 @@ questions.forEach((set, i) => {
 });
 
 // ---------------------------
-// Rank selection logic (animated + cross-row disabling)
+// Rank selection logic (animated)
 // ---------------------------
 function selectRank(q, r, value) {
   selectedRanks[q][r] = value;
@@ -70,8 +70,7 @@ function selectRank(q, r, value) {
     } else {
       btn.classList.remove("selected");
     }
-
-    btn.disabled = false; // selected row always stays enabled
+    // Do NOT touch disabled here; let updateRowDisabling handle it
   });
 
   updateRowDisabling(q);
@@ -81,22 +80,25 @@ function selectRank(q, r, value) {
 // Disable same rank in other rows of the question
 // ---------------------------
 function updateRowDisabling(q) {
-  const usedRanks = selectedRanks[q];
+  const usedRanks = selectedRanks[q]; // array of 4 values or null
 
   for (let r = 0; r < 4; r++) {
     const row = document.querySelector(`.rank-buttons[data-q="${q}"][data-r="${r}"]`);
+    if (!row) continue;
+
     const buttons = row.querySelectorAll("button");
 
     buttons.forEach(btn => {
       const v = Number(btn.textContent);
 
-      // If this row already selected something, keep all buttons enabled
+      // If this row already has a selection, keep all its buttons enabled
       if (usedRanks[r] !== null) {
         btn.disabled = false;
         return;
       }
 
-      // Disable ranks already used in other rows
+      // For rows without a selection:
+      // disable ranks already used in any other row of this question
       if (usedRanks.includes(v)) {
         btn.disabled = true;
       } else {
@@ -135,11 +137,11 @@ function validateQuestion(q) {
   for (let r = 0; r < 4; r++) {
     const val = selectedRanks[q][r];
     if (!val) {
-      alert(`Please complete all rankings in Question ${q+1}.`);
+      alert(`Please complete all rankings in Question ${q + 1}.`);
       return false;
     }
     if (used.includes(val)) {
-      alert(`Each rank (1–4) must be used once in Question ${q+1}.`);
+      alert(`Each rank (1–4) must be used once in Question ${q + 1}.`);
       return false;
     }
     used.push(val);
@@ -170,7 +172,7 @@ const mapping = {
 function scoreDISC() {
   const results = document.getElementById("results");
 
-  let D=0, I=0, S=0, C=0;
+  let D = 0, I = 0, S = 0, C = 0;
 
   for (let q = 0; q < 10; q++) {
     for (let r = 0; r < 4; r++) {
@@ -185,8 +187,8 @@ function scoreDISC() {
     }
   }
 
-  const totals = {D,I,S,C};
-  const primary = Object.entries(totals).sort((a,b)=>b[1]-a[1])[0][0];
+  const totals = { D, I, S, C };
+  const primary = Object.entries(totals).sort((a, b) => b[1] - a[1])[0][0];
 
   results.style.display = "block";
   results.innerHTML = `
