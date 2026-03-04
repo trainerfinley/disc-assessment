@@ -94,7 +94,7 @@ function updateRowDisabling(q) {
     buttons.forEach(btn => {
       const v = Number(btn.textContent);
 
-      // If this row already selected something:
+      // If THIS row already selected something:
       // keep all buttons enabled so the user can change their choice
       if (rowValue !== null) {
         btn.disabled = false;
