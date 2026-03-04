@@ -76,10 +76,15 @@ function selectRank(q, r, value) {
 }
 
 // ---------------------------
-// Disable same rank in ALL other rows (exact behavior of reference page)
+// Disable same rank in ALL other rows (correct behavior)
 // ---------------------------
 function updateRowDisabling(q) {
   const usedRanks = selectedRanks[q]; // e.g., [3, null, 1, null]
+
+  // If all four rows have selections, do nothing — final state.
+  if (usedRanks.every(v => v !== null)) {
+    return;
+  }
 
   for (let r = 0; r < 4; r++) {
     const row = document.querySelector(`.rank-buttons[data-q="${q}"][data-r="${r}"]`);
@@ -89,14 +94,15 @@ function updateRowDisabling(q) {
     buttons.forEach(btn => {
       const v = Number(btn.textContent);
 
-      // If this row already selected something, keep all buttons enabled
+      // If this row already selected something:
+      // keep all buttons enabled so the user can change their choice
       if (rowValue !== null) {
         btn.disabled = false;
         return;
       }
 
       // If this row has NOT selected yet:
-      // Disable any number used in ANY other row
+      // disable any number used in ANY other row
       if (usedRanks.includes(v)) {
         btn.disabled = true;
       } else {
