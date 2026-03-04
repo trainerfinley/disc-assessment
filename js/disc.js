@@ -95,19 +95,15 @@ function updateRowDisabling(q) {
       const v = Number(btn.textContent);
 
       // If THIS row already selected something:
-      // keep all buttons enabled so the user can change their choice
+      // keep all buttons enabled, BUT DO NOT re-enable numbers used elsewhere
       if (rowValue !== null) {
-        btn.disabled = false;
+        btn.disabled = (v !== rowValue && usedRanks.includes(v));
         return;
       }
 
       // If this row has NOT selected yet:
-      // disable any number used in ANY other row
-      if (usedRanks.includes(v)) {
-        btn.disabled = true;
-      } else {
-        btn.disabled = false;
-      }
+      // disable any number already used in ANY other row
+      btn.disabled = usedRanks.includes(v);
     });
   }
 }
