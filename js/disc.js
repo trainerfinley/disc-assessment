@@ -52,7 +52,7 @@ questions.forEach((set, i) => {
 });
 
 // ---------------------------
-// Rank selection logic (animated)
+// Rank selection logic (animated + global disabling)
 // ---------------------------
 function selectRank(q, r, value) {
   selectedRanks[q][r] = value;
@@ -70,35 +70,31 @@ function selectRank(q, r, value) {
     } else {
       btn.classList.remove("selected");
     }
-    // Do NOT touch disabled here; let updateRowDisabling handle it
   });
 
   updateRowDisabling(q);
 }
 
 // ---------------------------
-// Disable same rank in other rows of the question
+// Disable same rank in ALL other rows (correct behavior)
 // ---------------------------
 function updateRowDisabling(q) {
-  const usedRanks = selectedRanks[q]; // array of 4 values or null
+  const usedRanks = selectedRanks[q]; // [?, ?, ?, ?]
 
   for (let r = 0; r < 4; r++) {
     const row = document.querySelector(`.rank-buttons[data-q="${q}"][data-r="${r}"]`);
-    if (!row) continue;
-
     const buttons = row.querySelectorAll("button");
 
     buttons.forEach(btn => {
       const v = Number(btn.textContent);
 
-      // If this row already has a selection, keep all its buttons enabled
+      // If this row already selected something, keep all buttons enabled
       if (usedRanks[r] !== null) {
         btn.disabled = false;
         return;
       }
 
-      // For rows without a selection:
-      // disable ranks already used in any other row of this question
+      // Disable numbers used in ANY other row
       if (usedRanks.includes(v)) {
         btn.disabled = true;
       } else {
@@ -210,12 +206,10 @@ function scoreDISC() {
 function retake() {
   const results = document.getElementById("results");
 
-  // Reset selections
   selectedRanks.forEach((row, q) => {
     row.forEach((_, r) => selectedRanks[q][r] = null);
   });
 
-  // Reset buttons
   document.querySelectorAll(".rank-buttons button").forEach(btn => {
     btn.disabled = false;
     btn.classList.remove("selected");
